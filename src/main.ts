@@ -164,9 +164,14 @@ async function run(): Promise<void> {
         manifestDir,
     );
 
-    await cache.restore();
+    const use_cache = rustCore.input.getInputBool("use-cache");
+    if (use_cache) {
+        await cache.restore();
+    }
     await runCargoSemverChecks(cargo);
-    await cache.save();
+    if (use_cache) {
+        await cache.save();
+    }
 }
 
 async function main() {
