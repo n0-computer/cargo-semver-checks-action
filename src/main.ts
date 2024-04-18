@@ -22,11 +22,11 @@ function getCheckReleaseArguments(): string[] {
         optionFromList("--exclude", rustCore.input.getInputList("exclude")),
         optionIfValueProvided("--manifest-path", rustCore.input.getInput("manifest-path")),
         optionIfValueProvided("--release-type", rustCore.input.getInput("release-type")),
+        optionIfValueProvided("--baseline-version", rustCore.input.getInput("baseline-version")),
+        optionIfValueProvided("--baseline-rev", rustCore.input.getInput("baseline-rev")),
         getFeatureGroup(rustCore.input.getInput("feature-group")),
         optionFromList("--features", rustCore.input.getInputList("features")),
         rustCore.input.getInputBool("verbose") ? ["--verbose"] : [],
-        optionIfValueProvided("--baseline-version", rustCore.input.getInput("baseline-version")),
-        optionIfValueProvided("--baseline-rev", rustCore.input.getInput("baseline-rev")),
     ].flat();
 }
 
@@ -156,15 +156,22 @@ async function run(): Promise<void> {
 
     await installCargoSemverChecks(cargo);
 
+    const cacheRoot = rustCore.input.getInput("cache-root");
+
     const cache = new RustdocCache(
         cargo,
-        path.join(CARGO_TARGET_DIR, "semver-checks", "cache"),
+        path.join(cacheRoot ? cacheRoot : CARGO_TARGET_DIR, "semver-checks", "cache"),
         manifestDir,
     );
 
-    await cache.restore();
+    const use_cache = rustCore.input.getInputBool("use-cache");
+    if (use_cache) {
+        await cache.restore();
+    }
     await runCargoSemverChecks(cargo);
-    await cache.save();
+    if (use_cache) {
+        await cache.save();
+    }
 }
 
 async function main() {
