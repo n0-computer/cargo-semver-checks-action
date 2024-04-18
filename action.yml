@@ -46,6 +46,9 @@ inputs:
   baseline-rev:
     description: 'TODO'
     required: false
+  cache-root:
+    description: 'Root for caching'
+    required: false
 runs:
   using: 'node20'
   main: 'dist/index.js'

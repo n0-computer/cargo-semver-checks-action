@@ -156,9 +156,15 @@ async function run(): Promise<void> {
 
     await installCargoSemverChecks(cargo);
 
+    const cacheRoot = rustCore.input.getInput("cache-root");
+
     const cache = new RustdocCache(
         cargo,
-        path.join(CARGO_TARGET_DIR, "semver-checks", "cache"),
+        path.join(
+            cacheRoot ? cacheRoot : CARGO_TARGET_DIR,
+            "semver-checks",
+            "cache"
+        ),
         manifestDir,
     );
 
